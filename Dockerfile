@@ -1,4 +1,4 @@
-FROM openresty/openresty:1.13.6.2-alpine
+FROM openresty/openresty:1.15.8.3-alpine-fat-nosse42
 MAINTAINER Hans Kristian Flaatten <hans.flaatten@evry.com>
 
 ENV \
