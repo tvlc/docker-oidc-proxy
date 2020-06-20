@@ -1,17 +1,19 @@
-version: '2'
+version: "3.8"
 
 services:
   downstream:
     image: nginx:alpine
     ports:
       - 8282:80
-    network_mode: bridge
+    networks: 
+      - keycloak-network
 
   echo:
     image: gcr.io/google_containers/echoserver:1.8
-    ports:
-      - 8383:8080
-    network_mode: bridge
+#    ports:
+#      - 8383:8080
+    networks: 
+      - keycloak-network
 
   proxy:
     build: .
@@ -25,20 +27,28 @@ services:
       - OID_SESSION_NAME=oidc_auth
 
       - OID_REDIRECT_PATH=/redirect_uri
-      - OID_DISCOVERY=http://192.168.99.100:8080/auth/realms/master/.well-known/openid-configuration
+      - OID_DISCOVERY=http://DOCKERHOST:8080/auth/realms/neobox/.well-known/openid-configuration
       - OID_CLIENT_ID=proxy
       - OID_CLIENT_SECRET=dee59d02-b1a9-455a-bd3c-38d2e060bf0f
 
-      - PROXY_HOST=192.168.99.100
-      - PROXY_PORT=8383
+      - PROXY_HOST=echo
+      - PROXY_PORT=8080
       - PROXY_PROTOCOL=http
-    network_mode: bridge
+    networks: 
+      - keycloak-network
 
-  keycloak:
-    image: jboss/keycloak
-    ports:
-      - 8080:8080
-    environment:
-    - KEYCLOAK_USER=admin
-    - KEYCLOAK_PASSWORD=admin
-    network_mode: bridge
+#  keycloak:
+#    image: jboss/keycloak
+#    ports:
+#      - 8080:8080
+#    environment:
+#      - KEYCLOAK_USER=admin
+#      - KEYCLOAK_PASSWORD=admin
+#    networks: 
+#      - keycloak-network
+
+networks:
+  keycloak-network:
+    external:
+      name: keycloak-network
+
